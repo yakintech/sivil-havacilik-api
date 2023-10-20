@@ -1,0 +1,29 @@
+{
+  "name": "pdfconverter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "fs": "^0.0.1-security",
+    "html-pdf": "^3.0.1",
+    "html-pdf-node": "^1.0.7",
+    "nodemon": "^3.0.1",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "pdf2html": "^3.1.0",
+    "pdfcrowd": "^5.14.0",
+    "pdfkit": "^0.13.0",
+    "pdfmake": "^0.2.7",
+    "puppeteer": "^21.3.8"
+  }
+}
