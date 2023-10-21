@@ -69,10 +69,9 @@ app.post(
           }
           const browser = await puppeteer.launch({ headless: true });
           const page = await browser.newPage();
-          await page.goto('https://shark-app-pfvr3.ondigitalocean.app');
+          await page.goto('https://developer.chrome.com/');
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
-
           await page.setContent(htmlContent);
           const fileName = "muayine" + Date.now().toString() + ".pdf";
           await page.pdf({
