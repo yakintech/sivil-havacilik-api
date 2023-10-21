@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 //html to pdf
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 //html template write
 const ejs = require("ejs");
 //file read and write
@@ -66,8 +66,7 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({
-            headless: 'new'});
+          const browser = await puppeteer.launch({headless: true});
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
