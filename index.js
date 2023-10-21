@@ -1,37 +1,43 @@
-const puppeteer = require("puppeteer");
 const express = require("express");
 const bodyParser = require("body-parser");
-const path = require("path");
+//html to pdf
+const puppeteer = require("puppeteer");
+//html template write
 const ejs = require("ejs");
+//file read and write
 const fs = require("fs");
+//mail package
+const nodemailer = require("nodemailer");
 
 const { body, validationResult } = require("express-validator");
 
 const templateFilePath = "muayine_template.html";
 const outputFilePath = "muayine_done.html";
 
+//mail configuration
 let configOptions = {
-  host: "smtp.gmail.com",
-  port: 587,
-  tls: {
+  service: "gmail",
+  auth: {
     user: "revanzakaryali@gmail.com",
-    pass: "ihfk qzqy oyvm xmdl",
+    pass: "ihfkqzqyoyvmxmdl",
   },
 };
+const transporter = nodemailer.createTransport(configOptions);
 
 const app = express();
 const port = 8080;
 
+//middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
 
+//app get endpoint
 app.get("/", (req, res) => {
   return res.status(200).send("Server runnig");
 });
 
-//1. pdf send mail
-//
+//reports post endpoint
 app.post(
   "/api/reports",
   [
@@ -40,57 +46,71 @@ app.post(
       .withMessage("Username must be at least 5 characters"),
   ],
   (req, res) => {
+    //validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     const { body } = req;
 
+    //read html template
     fs.readFile(templateFilePath, "utf8", async (err, template) => {
       if (err) {
-        res.status(500).send("Error read file");
+        return res.status(500).send("Error read file");
       } else {
         const renderedHTML = ejs.render(template, body);
+
+        //write pdf
         fs.writeFile(outputFilePath, renderedHTML, "utf8", async (err) => {
           if (err) {
-            res.status(500).send("Error write file");
+            return res.status(500).send("Error write file");
           }
           const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
           await page.setContent(htmlContent);
-          const fileName =
-            body.fullName.replace(" ", "") + Date.now().toString() + ".pdf";
+          const fileName = "muayine" + Date.now().toString() + ".pdf";
           await page.pdf({
             path: fileName,
             format: "A3",
           });
           await browser.close();
 
-          fs.readFile(fileName, function (err, data) {
-            if (err) res.status(500).send("Error read file 2");
-
+          //read pdf to mail
+          fs.readFile("./" + fileName, async (err, data) => {
+            if (err) return res.status(500).send("Error read file 2");
             var mailOptions = {
               from: "revanzakaryali@gmail.com",
               to: body.email,
               subject: "Rapor",
               text: "Tıbbı muayine raporu",
-              html: "<b>Hello world attachment test HTML</b>",
+              html: "<b>Sağlıkla kalın :) </b>",
               attachments: [
                 {
                   filename: fileName,
                   contentType: "application/pdf",
+                  content: data
                 },
               ],
             };
 
-            res.status(200).send("Ok");
+            await transporter.sendMail(mailOptions, (err, info) => {
+              if (err) {
+                return res.status(500).send("Mail send error");
+              }
+              return res.status(200).send("Ok");
+            });
           });
         });
       }
     });
   }
 );
+
+// app.use((err, req, res, next) => {
+//   return res.status(500).json({ error: "Internal Server Error" });
+// });
 
 app.listen(port);
