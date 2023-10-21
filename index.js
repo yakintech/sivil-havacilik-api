@@ -68,7 +68,6 @@ app.post(
             return res.status(500).send("Error write file");
           }
           const browser = await puppeteer.launch({
-            headless: true,
             args: [
               '--no-sandbox',
               '--disable-setuid-sandbox',
