@@ -66,7 +66,8 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+          const browser = await puppeteer.launch({
+            headless: 'new'});
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
