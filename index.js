@@ -10,6 +10,15 @@ const { body, validationResult } = require("express-validator");
 const templateFilePath = "muayine_template.html";
 const outputFilePath = "muayine_done.html";
 
+let configOptions = {
+  host: "smtp.gmail.com",
+  port: 587,
+  tls: {
+    user: "revanzakaryali@gmail.com",
+    pass: "ihfk qzqy oyvm xmdl",
+  },
+};
+
 const app = express();
 const port = 8080;
 
@@ -22,7 +31,7 @@ app.get("/", (req, res) => {
 });
 
 //1. pdf send mail
-// 
+//
 app.post(
   "/api/reports",
   [
@@ -51,13 +60,33 @@ app.post(
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
           await page.setContent(htmlContent);
-
+          const fileName =
+            body.fullName.replace(" ", "") + Date.now().toString() + ".pdf";
           await page.pdf({
-            path: body.fullName + Date.now().toString() + ".pdf",
+            path: fileName,
             format: "A3",
           });
           await browser.close();
-          res.status(200).send("Ok");
+
+          fs.readFile(fileName, function (err, data) {
+            if (err) res.status(500).send("Error read file 2");
+
+            var mailOptions = {
+              from: "revanzakaryali@gmail.com",
+              to: body.email,
+              subject: "Rapor",
+              text: "Tıbbı muayine raporu",
+              html: "<b>Hello world attachment test HTML</b>",
+              attachments: [
+                {
+                  filename: fileName,
+                  contentType: "application/pdf",
+                },
+              ],
+            };
+
+            res.status(200).send("Ok");
+          });
         });
       }
     });
