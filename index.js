@@ -8,7 +8,7 @@ const ejs = require("ejs");
 const fs = require("fs");
 //mail package
 const nodemailer = require("nodemailer");
-const {executablePath} = require('puppeteer')
+const { executablePath } = require('puppeteer')
 
 const { body, validationResult } = require("express-validator");
 
@@ -67,11 +67,14 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({headless: true,
+          const browser = await puppeteer.launch({
+            headless: true,
             args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            ]});
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+            ],
+            executablePath: executablePath()
+          });
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
