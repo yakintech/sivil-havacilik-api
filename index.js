@@ -1,14 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 //html to pdf
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 //html template write
 const ejs = require("ejs");
 //file read and write
 const fs = require("fs");
 //mail package
 const nodemailer = require("nodemailer");
-const { executablePath } = require('puppeteer')
+const { executablePath } = require("puppeteer");
 
 const { body, validationResult } = require("express-validator");
 
@@ -67,15 +67,10 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({
-            args: [
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-            ],
-            executablePath: executablePath()
-          });
+          const browser = await puppeteer.launch({ headless: true });
           const page = await browser.newPage();
-
+          const version = await page.browser().version();
+          return res.status(200).send(version);
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
           await page.setContent(htmlContent);
           const fileName = "muayine" + Date.now().toString() + ".pdf";
@@ -98,7 +93,7 @@ app.post(
                 {
                   filename: fileName,
                   contentType: "application/pdf",
-                  content: data
+                  content: data,
                 },
               ],
             };
