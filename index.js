@@ -111,8 +111,8 @@ app.post(
   }
 );
 
-// app.use((err, req, res, next) => {
-//   return res.status(500).json({ error: "Internal Server Error" });
-// });
+app.use((err, req, res, next) => {
+  return res.status(500).json({ error: err?.message });
+});
 
 app.listen(port);
