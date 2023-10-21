@@ -67,7 +67,11 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({headless: false,  executablePath: executablePath()});
+          const browser = await puppeteer.launch({headless: true,
+            args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            ]});
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
