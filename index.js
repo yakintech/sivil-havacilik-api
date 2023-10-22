@@ -67,9 +67,8 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch({ headless: true });
+          const browser = await puppeteer.launch();
           const page = await browser.newPage();
-          await page.goto('https://developer.chrome.com/');
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
           await page.setContent(htmlContent);
