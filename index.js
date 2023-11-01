@@ -8,12 +8,10 @@ const ejs = require("ejs");
 const fs = require("fs");
 //mail package
 const nodemailer = require("nodemailer");
-const { executablePath } = require("puppeteer");
-
 const { body, validationResult } = require("express-validator");
 
-const templateFilePath = "muayine_template.html";
-const outputFilePath = "muayine_done.html";
+const templateFilePath = __dirname + "/muayine_template.html";
+const outputFilePath = __dirname + "/muayine_done.html";
 
 //mail configuration
 let configOptions = {
@@ -26,7 +24,10 @@ let configOptions = {
 const transporter = nodemailer.createTransport(configOptions);
 
 const app = express();
-const port = 8080;
+const port = 3000;
+
+const cors = require("cors");
+app.use(cors());
 
 //middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -67,7 +68,10 @@ app.post(
           if (err) {
             return res.status(500).send("Error write file");
           }
-          const browser = await puppeteer.launch();
+          const browser = await puppeteer.launch({
+            executablePath: "/usr/bin/chromium-browser",
+            args: ["--no-sandbox"],
+          });
           const page = await browser.newPage();
 
           const htmlContent = fs.readFileSync(outputFilePath, "utf8");
